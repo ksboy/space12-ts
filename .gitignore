@@ -127,3 +127,21 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+
+# data
+*.tgz
+*.tar.gz
+data/
+output/
+
+bart/cnn_dm/
+bertabs/cnn/cnn-dm/
+
+bart/lightning_logs/
+bart/files2rouge/
+
+# project
+.vscode
+ts-code/
