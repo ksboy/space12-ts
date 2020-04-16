@@ -104,8 +104,8 @@ class BaseTransformer(pl.LightningModule):
         self.lr_scheduler.step()
 
     # def get_tqdm_dict(self):
-    #     tqdm_dict = {"loss": "{:.3f}".format(self.trainer.avg_loss), "lr": self.lr_scheduler.get_last_lr()[-1]}
-
+    #     avg_loss = getattr(self.trainer, "avg_loss", 0.0)
+    #     tqdm_dict = {"loss": "{:.3f}".format(avg_loss), "lr": self.lr_scheduler.get_last_lr()[-1]}
     #     return tqdm_dict
 
     def test_step(self, batch, batch_nb):
@@ -238,8 +238,9 @@ def add_generic_args(parser, root_dir):
         help="For fp16: Apex AMP optimization level selected in ['O0', 'O1', 'O2', and 'O3']."
         "See details at https://nvidia.github.io/apex/amp.html",
     )
-
+    
     parser.add_argument("--n_gpu", type=int, default=1)
+    parser.add_argument("--val_check_interval", type=float, default=1.0)
     parser.add_argument("--n_tpu_cores", type=int, default=0)
     parser.add_argument("--max_grad_norm", default=1.0, type=float, help="Max gradient norm.")
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
@@ -281,6 +282,7 @@ def generic_train(model, args):
 
     train_params = dict(
         accumulate_grad_batches=args.gradient_accumulation_steps,
+        val_check_interval=args.val_check_interval,
         gpus=args.n_gpu,
         max_epochs=args.num_train_epochs,
         early_stop_callback=early_stop_callback,
