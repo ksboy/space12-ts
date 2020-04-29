@@ -108,11 +108,11 @@ class BaseTransformer(pl.LightningModule):
     #     tqdm_dict = {"loss": "{:.3f}".format(avg_loss), "lr": self.lr_scheduler.get_last_lr()[-1]}
     #     return tqdm_dict
 
-    def test_step(self, batch, batch_nb):
-        return self.validation_step(batch, batch_nb)
+    # def test_step(self, batch, batch_nb):
+    #     return self.validation_step(batch, batch_nb)
 
-    def test_end(self, outputs):
-        return self.validation_end(outputs)
+    # def test_end(self, outputs):
+    #     return self.validation_end(outputs)
 
     def train_dataloader(self):
         train_batch_size = self.hparams.train_batch_size
@@ -277,7 +277,7 @@ def generic_train(model, args):
         filepath=args.output_dir, prefix="checkpoint", monitor="val_loss", mode="min", save_top_k=1
     )
     early_stop_callback = pl.callbacks.EarlyStopping(
-        monitor="val_loss", mode="min"
+        monitor="val_loss", mode="min", patience=3
     )
 
     train_params = dict(

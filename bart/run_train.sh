@@ -2,8 +2,8 @@
 
 
 DATA_DIR=./space
-OUTPUT_DIR=../output/space/bart
-MODEL_PATH=/home/whou/workspace/bart-large-cnn/
+OUTPUT_DIR=../output/space/bart/
+MODEL_PATH=/home/mhxia/whou/workspace/pretrained_models/bart-large-cnn/
 MAX_LENGTH=256
 BATCH_SIZE=1
 EVAL_BATCH_SIZE=8
@@ -12,12 +12,15 @@ WARMUP_STEPS=1800
 SEED=1
 LR=3e-5
 
-CUDA_VISIBLE_DEVICES=0 python run_bart_sum.py \
+export CUDA_VISIBLE_DEVICES=0,1
+
+python run_bart_sum.py \
 --model_type bart \
 --model_name_or_path $MODEL_PATH \
---n_gpu 1 \
---val_check_interval 0.5 \
+--n_gpu 2 \
+--val_check_interval 0.05 \
 --do_train \
+--do_predict \
 --data_dir $DATA_DIR \
 --output_dir $OUTPUT_DIR \
 --max_seq_length  $MAX_LENGTH \
@@ -29,4 +32,4 @@ CUDA_VISIBLE_DEVICES=0 python run_bart_sum.py \
 --weight_decay 0 \
 --warmup_steps $WARMUP_STEPS \
 --seed $SEED \
-# --fp16 \
+# --fp16 

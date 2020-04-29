@@ -67,10 +67,12 @@ class BartSystem(BaseTransformer):
         generated_ids = self.model.generate(
             batch["source_ids"],
             attention_mask=batch["source_mask"],
-            num_beams=1,
-            max_length=80,
+            num_beams=4,
+            min_length =6+1,
+            max_length=40+2,
             repetition_penalty=2.5,
             length_penalty=1.0,
+            no_repeat_ngram_size=3,
             early_stopping=True,
         )
         preds = [
@@ -82,13 +84,16 @@ class BartSystem(BaseTransformer):
             for t in batch["target_ids"]
         ]
         loss = self._step(batch)
-
+        # print(preds, target)
+        # for pred in preds: outf.write(pred+ "\n")
         return {"val_loss": loss, "preds": preds, "target": target}
 
-    def test_end(self, outputs):
-        return self.validation_end(outputs)
+    # def test_end(self, outputs):
+    #     print("test_end")
+    #     return self.validation_end(outputs)
 
     def test_epoch_end(self, outputs):
+        print("test_epoch_end")
         output_test_predictions_file = os.path.join(self.hparams.output_dir, "test_predictions.txt")
         output_test_targets_file = os.path.join(self.hparams.output_dir, "test_targets.txt")
         # write predictions and targets for later rouge evaluation.
@@ -99,7 +104,7 @@ class BartSystem(BaseTransformer):
             p_writer.close()
             t_writer.close()
 
-        return self.test_end(outputs)
+        return self.validation_end(outputs)
 
     def train_dataloader(self):
         train_dataset = SpaceDataset(
@@ -167,6 +172,11 @@ if __name__ == "__main__":
 
     # Optionally, predict on dev set and write to output_dir
     if args.do_predict:
-        checkpoints = list(sorted(glob.glob(os.path.join(args.output_dir, "checkpointepoch=*.ckpt"), recursive=True)))
-        BartSystem.load_from_checkpoint(checkpoints[-1])
+        # checkpoints = list(sorted(glob.glob(os.path.join(args.output_dir, "checkpointepoch=*.ckpt"), recursive=True)))
+        checkpoints = [os.path.join(args.output_dir, "checkpointcheckpoint_ckpt_epoch_0_v1.ckpt")]
+        print(checkpoints)
+        print("load model from ", checkpoints[-1])
+        model = model.load_from_checkpoint(checkpoints[-1])
+        print("model loaded")
+        trainer.test_percent_check=0.1
         trainer.test(model)

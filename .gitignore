@@ -134,10 +134,9 @@ dmypy.json
 *.tgz
 *.tar.gz
 data/
+!data/space/
 output/
 
-bart/cnn_dm/
-bertabs/cnn/cnn-dm/
 
 bart/lightning_logs/
 bart/files2rouge/
